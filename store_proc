@@ -1,0 +1,138 @@
+create database dropdownsp
+use dropdownsp
+create table country(CID INT PRIMARY KEY IDENTITY,CNAME VARCHAR(100))
+CREATE TABLE STATE(SID INT PRIMARY KEY IDENTITY,SNAME VARCHAR(100),CID INT FOREIGN KEY REFERENCES COUNTRY(CID))
+CREATE TABLE CITY(CTID INT PRIMARY KEY IDENTITY,CTNAME VARCHAR(100),SID INT FOREIGN KEY REFERENCES STATE(SID))
+
+INSERT INTO COUNTRY VALUES
+('INDIA'),
+('USA')
+select * from state
+
+insert into state values 
+('uttar pradesh',1),
+('new york',2)
+ insert into CITY values 
+ ('moradabad',1),
+('amroha',1)
+
+select*from city
+
+create proc sp_country
+@action varchar(50),
+@cid int=0,
+@cname varchar(50)=null
+as 
+begin 
+if @action='create'
+begin 
+insert into country(CNAME)values(@cname)
+end
+else if 
+@action='select'
+begin
+select*from country
+end 
+else if 
+@action='select_one'
+begin
+select*from country where CID=@cid
+end 
+else if 
+@action='update'
+begin 
+update country set CNAME=@cname
+end 
+else if 
+@action='delete'
+begin
+delete from country where CID=@cid
+end 
+end
+
+
+
+
+create proc sp_state
+@action varchar(50),
+@sid int=0,
+@sname varchar(50)=null,
+@cid int=null
+as 
+begin 
+if
+@action='create'
+begin
+insert into state(SNAME,CID)values(@sname,@cid)
+end
+else if 
+@action='select'
+begin
+select a.cid,a.cname,
+b.sname from country a
+inner join
+state b on 
+a.cid=b.SID
+end
+else if 
+@action='select_one'
+begin
+select*from state where sid=@sid
+end 
+else if 
+@action='update'
+begin
+update state set SNAME=@sname
+end 
+else if 
+@action='delete'
+begin
+delete from state where sid=@sid
+end 
+end
+
+
+create proc sp_city
+@action varchar(40),
+@ctid int=0,
+@ctname varchar(50)=null,
+@sid int=0
+as 
+begin 
+if 
+@action='create'
+begin 
+insert into CITY(CTNAME,SID)values(@ctname,@sid)
+END 
+else if 
+@action='select'
+begin
+select*from CITY
+as c
+inner join state as s 
+on
+s.SID=s.SID inner join country as co on 
+s.CID=co.CID
+end
+else if 
+@action='select_one'
+begin
+select*from CITY where CTID=@ctid
+end
+else if 
+@action='update'
+begin 
+update CITY set CTNAME=@ctname
+end
+else if 
+@action='delete'
+begin 
+delete from CITY where CTID=@ctid
+end
+end 
+
+
+sp_country 'create',0,'nepal'
+sp_state 'create',0,'dehli',1
+sp_city 'create',0,'bilari',1
+sp_city 'select'
